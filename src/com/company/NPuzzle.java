@@ -46,9 +46,9 @@ public class NPuzzle {
 
     private int getSmallestBound(ArrayList<Node> path, int pathCost, int currentFBound) {
         Node currentNode = path.get(path.size() - 1);
-        currentNode.sethValue(heuristicFunction.getHeuristicValue(currentState.getBoard(), goalState, sizeOfBoard));
+        currentNode.sethValue(heuristicFunction.getHeuristicValue(currentNode.getBoard(), goalState, sizeOfBoard));
         currentNode.setgValue(pathCost);
-        currentNode.setfValue(pathCost + currentState.gethValue());
+        currentNode.setfValue(pathCost + currentNode.gethValue());
 
         if (currentNode.getfValue() > currentFBound) {
             return currentNode.getfValue();
@@ -75,6 +75,7 @@ public class NPuzzle {
                 if (nextSmallestFBound < smallestFBound) {
                     smallestFBound = nextSmallestFBound;
                 }
+                //Remove Child From Search Path Before Exploring Next Child
                 path.remove(path.size() - 1);
             }
         }
@@ -124,24 +125,24 @@ public class NPuzzle {
             System.arraycopy(currentState.getBoard()[i], 0, currentBoard[i], 0, sizeOfBoard);
         }
 
-        int rowIndex = currentState.getIndexOfZero().getFirst();
-        int colIndex = currentState.getIndexOfZero().getSecond();
+        int rowIndexOfZero = currentState.getIndexOfZero().getFirst();
+        int colIndexOfZero = currentState.getIndexOfZero().getSecond();
 
         switch (direction) {
             case LEFT:
-                moveTile(currentBoard, rowIndex, colIndex, colIndex - 1, currentBoard[rowIndex]);
+                moveTile(currentBoard, rowIndexOfZero, colIndexOfZero, colIndexOfZero - 1, currentBoard[rowIndexOfZero]);
                 node.setDirection(Direction.RIGHT);
                 break;
             case UP:
-                moveTile(currentBoard, rowIndex - 1, colIndex, colIndex, currentBoard[rowIndex]);
+                moveTile(currentBoard, rowIndexOfZero - 1, colIndexOfZero, colIndexOfZero, currentBoard[rowIndexOfZero]);
                 node.setDirection(Direction.DOWN);
                 break;
             case DOWN:
-                moveTile(currentBoard, rowIndex + 1, colIndex, colIndex, currentBoard[rowIndex]);
+                moveTile(currentBoard, rowIndexOfZero + 1, colIndexOfZero, colIndexOfZero, currentBoard[rowIndexOfZero]);
                 node.setDirection(Direction.UP);
                 break;
             case RIGHT:
-                moveTile(currentBoard, rowIndex, colIndex, colIndex + 1, currentBoard[rowIndex]);
+                moveTile(currentBoard, rowIndexOfZero, colIndexOfZero, colIndexOfZero + 1, currentBoard[rowIndexOfZero]);
                 node.setDirection(Direction.LEFT);
                 break;
         }
