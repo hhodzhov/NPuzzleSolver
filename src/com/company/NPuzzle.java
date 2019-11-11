@@ -22,35 +22,35 @@ public class NPuzzle {
     }
 
     public Node IDAStarSearch() {
-        int currentFBound = heuristicFunction.getHeuristicValue(currentState.getBoard(), goalState, sizeOfBoard);
+        int threshold = heuristicFunction.getHeuristicValue(currentState.getBoard(), goalState, sizeOfBoard);
 
         ArrayList<Node> path = new ArrayList<>();
         path.add(0, currentState);
 
-        int nextSmallestBound;
+        int nextMinThreshold;
 
         do {
             currentState.setChildren(new ArrayList<>());
-            nextSmallestBound = getSmallestBound(path, 0, currentFBound);
+            nextMinThreshold = getNextThreshold(path, 0, threshold);
 
-            if (nextSmallestBound == 0) {
+            if (nextMinThreshold == 0) {
                 return path.get(path.size() - 1);
             }
 
-            currentFBound = nextSmallestBound;
+            threshold = nextMinThreshold;
 
-        } while (currentFBound != Integer.MAX_VALUE);
+        } while (threshold != Integer.MAX_VALUE);
 
         return null;
     }
 
-    private int getSmallestBound(ArrayList<Node> path, int pathCost, int currentFBound) {
+    private int getNextThreshold(ArrayList<Node> path, int pathCost, int threshold) {
         Node currentNode = path.get(path.size() - 1);
         currentNode.sethValue(heuristicFunction.getHeuristicValue(currentNode.getBoard(), goalState, sizeOfBoard));
         currentNode.setgValue(pathCost);
         currentNode.setfValue(pathCost + currentNode.gethValue());
 
-        if (currentNode.getfValue() > currentFBound) {
+        if (currentNode.getfValue() > threshold) {
             return currentNode.getfValue();
         }
 
@@ -58,29 +58,29 @@ public class NPuzzle {
             return 0;
         }
 
-        int smallestFBound = Integer.MAX_VALUE;
+        int minThreshold = Integer.MAX_VALUE;
 
         List<Node> children = generateChildren(currentNode);
 
         for (Node child : children) {
             if (!path.contains(child)) {
                 path.add(child);
-                int nextSmallestFBound =
-                        getSmallestBound(path, currentNode.getgValue() + child.getDistFromParent(), currentFBound);
+                int nextMinThreshold =
+                        getNextThreshold(path, currentNode.getgValue() + child.getDistFromParent(), threshold);
 
-                if (nextSmallestFBound == 0) {
+                if (nextMinThreshold == 0) {
                     return 0;
                 }
 
-                if (nextSmallestFBound < smallestFBound) {
-                    smallestFBound = nextSmallestFBound;
+                if (nextMinThreshold < minThreshold) {
+                    minThreshold = nextMinThreshold;
                 }
                 //Remove Child From Search Path Before Exploring Next Child
                 path.remove(path.size() - 1);
             }
         }
 
-        return smallestFBound;
+        return minThreshold;
     }
 
     public List<Node> getFinalPath(Node node) {
