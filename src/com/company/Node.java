@@ -23,6 +23,7 @@ public class Node {
 
     Pair<Integer, Integer> indexOfZero;
 
+    //We set the index of zero (the empty cell) in order to decide in which position we can move later
     public void setIndexOfZero() {
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board.length; j++) {
@@ -103,11 +104,11 @@ public class Node {
     @Override
     public boolean equals(Object o) {
         Node node = (Node) o;
-        int [][] otherTable = node.getBoard();
+        int [][] otherBoard = node.getBoard();
 
         for (int i = 0; i < board.length; i++) {
             for (int j = 0; j < board.length; j++) {
-                if (board[i][j] != otherTable[i][j]) {
+                if (board[i][j] != otherBoard[i][j]) {
                     return false;
                 }
             }

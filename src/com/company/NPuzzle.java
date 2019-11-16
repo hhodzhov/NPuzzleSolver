@@ -30,6 +30,7 @@ public class NPuzzle {
         int nextMinThreshold;
 
         do {
+            //clean the children at the beginning of each iteration
             currentState.setChildren(new ArrayList<>());
             nextMinThreshold = getNextThreshold(path, 0, threshold);
 
@@ -50,10 +51,13 @@ public class NPuzzle {
         currentNode.setgValue(pathCost);
         currentNode.setfValue(pathCost + currentNode.gethValue());
 
+        //if the currentFValue is > threshold we return the currentFValue as the next min threshold
         if (currentNode.getfValue() > threshold) {
             return currentNode.getfValue();
         }
 
+        //If the current board is equals to goal board -> we found the solution
+        //else we continue with exploring the children of the current node
         if (Arrays.deepEquals(currentNode.getBoard(), goalState)) {
             return 0;
         }
@@ -63,6 +67,7 @@ public class NPuzzle {
         List<Node> children = generateChildren(currentNode);
 
         for (Node child : children) {
+            //make a check in order to avoid already explored state
             if (!path.contains(child)) {
                 path.add(child);
                 int nextMinThreshold =
@@ -72,10 +77,11 @@ public class NPuzzle {
                     return 0;
                 }
 
+                //we always tend to take the min threshold for next iteration from all thresholds
                 if (nextMinThreshold < minThreshold) {
                     minThreshold = nextMinThreshold;
                 }
-                //Remove Child From Search Path Before Exploring Next Child
+                //Remove child from search path before exploring next child
                 path.remove(path.size() - 1);
             }
         }
@@ -118,8 +124,9 @@ public class NPuzzle {
     }
 
     private Node generateChild(Node currentState, Direction direction) {
-        Node node = new Node();
+        Node child = new Node();
 
+        //We should copy the current state's board, otherwise it will be changed in moveTile method.
         int[][] currentBoard = new int[sizeOfBoard][sizeOfBoard];
         for (int i = 0; i < sizeOfBoard; i++) {
             System.arraycopy(currentState.getBoard()[i], 0, currentBoard[i], 0, sizeOfBoard);
@@ -128,31 +135,33 @@ public class NPuzzle {
         int rowIndexOfZero = currentState.getIndexOfZero().getFirst();
         int colIndexOfZero = currentState.getIndexOfZero().getSecond();
 
+        //we move in reversed direction, because we represent 0 as a empty space
+        //which means that for example if we can move 0 to left -> we can move some tile to the right.
         switch (direction) {
             case LEFT:
                 moveTile(currentBoard, rowIndexOfZero, colIndexOfZero, colIndexOfZero - 1, currentBoard[rowIndexOfZero]);
-                node.setDirection(Direction.RIGHT);
+                child.setDirection(Direction.RIGHT);
                 break;
             case UP:
                 moveTile(currentBoard, rowIndexOfZero - 1, colIndexOfZero, colIndexOfZero, currentBoard[rowIndexOfZero]);
-                node.setDirection(Direction.DOWN);
+                child.setDirection(Direction.DOWN);
                 break;
             case DOWN:
                 moveTile(currentBoard, rowIndexOfZero + 1, colIndexOfZero, colIndexOfZero, currentBoard[rowIndexOfZero]);
-                node.setDirection(Direction.UP);
+                child.setDirection(Direction.UP);
                 break;
             case RIGHT:
                 moveTile(currentBoard, rowIndexOfZero, colIndexOfZero, colIndexOfZero + 1, currentBoard[rowIndexOfZero]);
-                node.setDirection(Direction.LEFT);
+                child.setDirection(Direction.LEFT);
                 break;
         }
 
-        node.setBoard(currentBoard);
-        node.setParent(currentState);
-        node.setIndexOfZero();
-        currentState.addChild(node);
+        child.setBoard(currentBoard);
+        child.setParent(currentState);
+        child.setIndexOfZero();
+        currentState.addChild(child);
 
-        return node;
+        return child;
     }
 
     private void moveTile(int[][] currentBoard, int rowIndex, int currentColIndex, int newColumnIndex,
